@@ -1,0 +1,1113 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockHub - Premium Dashboard</title>
+
+<script>
+/* Apply saved theme before the page is displayed */
+(function () {
+    const appearance = localStorage.getItem("stockhubAppearance") || "dark";
+    document.documentElement.classList.toggle("dark-mode", appearance === "dark");
+    document.documentElement.classList.toggle("light-mode", appearance === "light");
+})();
+</script>
+
+<style>
+:root {
+    --bg: #0b0915;
+    --sidebar: #100c20;
+    --panel: #171228;
+    --panel-hover: #201837;
+    --purple: #8b5cf6;
+    --violet: #a78bfa;
+    --pink: #d946ef;
+    --text: #f5f3ff;
+    --muted: #a49bbd;
+    --border: rgba(167,139,250,0.15);
+    --shadow: 0 12px 35px rgba(0,0,0,0.20);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(ellipse at 80% 0%, rgba(109,40,217,0.12), transparent 38%),
+        var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background: rgba(16,12,32,0.96);
+    border-right: 1px solid var(--border);
+    color: white;
+    padding: 28px 16px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 10px 28px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    font-size: 23px;
+    background: linear-gradient(135deg, #7c3aed, #c026d3);
+    box-shadow: 0 5px 20px rgba(139,92,246,0.35);
+}
+
+.logo h2 {
+    font-size: 23px;
+    letter-spacing: -0.7px;
+}
+
+.logo small {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+.nav-label {
+    color: #71678d;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    padding: 8px 13px 13px;
+}
+
+nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #b8afcf;
+    text-decoration: none;
+    padding: 13px 14px;
+    margin-bottom: 6px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: 0.25s ease;
+}
+
+nav a:hover {
+    background: rgba(139,92,246,0.10);
+    color: white;
+    transform: translateX(3px);
+}
+
+nav a.active {
+    color: white;
+    background: linear-gradient(100deg, #6d28d9, #8b5cf6);
+    box-shadow: 0 5px 20px rgba(124,58,237,0.25);
+}
+
+/* MAIN CONTENT */
+.main {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 34px;
+    min-width: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.eyebrow {
+    color: var(--violet);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 9px;
+}
+
+.header h1 {
+    font-size: clamp(25px, 3vw, 34px);
+    letter-spacing: -1px;
+    margin-bottom: 9px;
+}
+
+.header p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.search-box {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+}
+
+.search-box input {
+    width: 240px;
+    max-width: 100%;
+    padding: 13px 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
+    font-size: 13px;
+}
+
+.search-box input:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+}
+
+.search-box button {
+    padding: 13px 18px;
+    border: 0;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.search-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(139,92,246,0.25);
+}
+
+/* SUMMARY CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+    padding: 23px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: linear-gradient(145deg, #1d1632, #151023);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s, border-color 0.25s, background 0.25s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(167,139,250,0.42);
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    right: -45px;
+    top: -45px;
+    background: var(--glow, rgba(139,92,246,0.14));
+    filter: blur(2px);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    color: #c0b6d7;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.card-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: var(--icon-bg, rgba(139,92,246,0.16));
+    font-size: 21px;
+    flex-shrink: 0;
+}
+
+.card h2 {
+    font-size: 33px;
+    letter-spacing: -1px;
+    color: #fff;
+    margin-bottom: 9px;
+}
+
+.card p {
+    font-size: 11px;
+    color: #a69bbd;
+}
+
+.card-purple { --glow: rgba(139,92,246,0.19); --icon-bg: rgba(139,92,246,0.16); }
+.card-pink { --glow: rgba(217,70,239,0.16); --icon-bg: rgba(217,70,239,0.13); }
+.card-blue { --glow: rgba(59,130,246,0.16); --icon-bg: rgba(59,130,246,0.14); }
+.card-orange { --glow: rgba(245,158,11,0.14); --icon-bg: rgba(245,158,11,0.13); }
+
+/* CHART AND LOW STOCK */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.section,
+.orders-section {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: linear-gradient(145deg, #19132b, #151023);
+    box-shadow: var(--shadow);
+}
+
+.section h2,
+.orders-section h2 {
+    font-size: 17px;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+}
+
+.section-subtitle {
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+/* MONTHLY CHART */
+.chart {
+    min-height: 260px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-top: 10px;
+    overflow-x: auto;
+}
+
+.bar-container {
+    height: 235px;
+    min-width: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar {
+    width: min(30px, 75%);
+    background: linear-gradient(180deg, #c084fc, #7c3aed 75%, #5b21b6);
+    border-radius: 7px 7px 2px 2px;
+    min-height: 0;
+    box-shadow: 0 0 14px rgba(139,92,246,0.18);
+    transition: height 0.4s ease, filter 0.2s;
+}
+
+.bar:hover {
+    filter: brightness(1.35);
+}
+
+.month {
+    font-size: 10px;
+    color: #a49bbd;
+    padding-bottom: 8px;
+}
+
+.empty-message {
+    padding: 22px 0;
+    color: #8f85a8;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: auto;
+}
+
+/* LOW STOCK LIST */
+.product {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+}
+
+.product:last-child {
+    border-bottom: none;
+}
+
+.product span:first-child {
+    overflow-wrap: anywhere;
+    color: #e5def3;
+}
+
+.low {
+    color: #fda4af;
+    font-weight: 700;
+    background: rgba(244,63,94,0.11);
+    border: 1px solid rgba(244,63,94,0.15);
+    padding: 6px 9px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-size: 10px;
+}
+
+/* RECENT ORDERS */
+.orders-section {
+    overflow-x: auto;
+}
+
+.orders-section h2 {
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+}
+
+th, td {
+    padding: 16px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+}
+
+th {
+    background: rgba(139,92,246,0.09);
+    color: #bfb2dc;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+td {
+    color: #e5def3;
+}
+
+tbody tr {
+    transition: background 0.2s;
+}
+
+tbody tr:hover {
+    background: rgba(139,92,246,0.07);
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pending {
+    background: rgba(245,158,11,0.13);
+    color: #fcd34d;
+}
+
+.processing {
+    background: rgba(139,92,246,0.17);
+    color: #c4b5fd;
+}
+
+.shipped {
+    background: rgba(59,130,246,0.15);
+    color: #93c5fd;
+}
+
+.delivered {
+    background: rgba(34,197,94,0.13);
+    color: #86efac;
+}
+
+.cancelled {
+    background: rgba(244,63,94,0.13);
+    color: #fda4af;
+}
+
+/* LIGHT MODE */
+html.light-mode body {
+    --bg: #f5f3ff;
+    --sidebar: #ffffff;
+    --panel: #ffffff;
+    --panel-hover: #f3edff;
+    --text: #25183d;
+    --muted: #786b91;
+    --border: rgba(109,40,217,0.13);
+    --shadow: 0 8px 24px rgba(76,29,149,0.07);
+    background: #f5f3ff;
+    color: var(--text);
+}
+
+html.light-mode .sidebar {
+    background: #ffffff;
+    color: #25183d;
+}
+
+html.light-mode .logo h2 {
+    color: #2e1850;
+}
+
+html.light-mode .logo small {
+    color: #786b91;
+}
+
+html.light-mode nav a {
+    color: #665778;
+}
+
+html.light-mode nav a.active {
+    color: #ffffff;
+}
+
+html.light-mode nav a:hover {
+    color: #5b21b6;
+}
+
+html.light-mode nav a.active:hover {
+    color: #ffffff;
+}
+
+html.light-mode .card,
+html.light-mode .section,
+html.light-mode .orders-section {
+    background: #ffffff;
+}
+
+html.light-mode .card h2 {
+    color: #2e1850;
+}
+
+html.light-mode .card h3,
+html.light-mode .card p,
+html.light-mode .section-subtitle,
+html.light-mode .month,
+html.light-mode .product span:first-child,
+html.light-mode td {
+    color: #665778;
+}
+
+html.light-mode .header h1,
+html.light-mode .section h2,
+html.light-mode .orders-section h2 {
+    color: #2e1850;
+}
+
+html.light-mode .header p {
+    color: #786b91;
+}
+
+html.light-mode .search-box input {
+    background: #ffffff;
+    color: #25183d;
+}
+
+html.light-mode th {
+    background: #f4efff;
+    color: #60418d;
+}
+
+html.light-mode tbody tr:hover {
+    background: #f8f4ff;
+}
+
+html.light-mode .empty-message {
+    color: #887a9e;
+}
+
+html.light-mode .product {
+    border-bottom-color: var(--border);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .main {
+        padding: 26px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .sidebar {
+        width: 190px;
+        padding: 20px 10px;
+    }
+
+    .logo {
+        padding-left: 4px;
+    }
+
+    .logo h2 {
+        font-size: 19px;
+    }
+
+    nav a {
+        padding: 12px 9px;
+        font-size: 12px;
+        gap: 8px;
+    }
+
+    .main {
+        margin-left: 190px;
+        width: calc(100% - 190px);
+        padding: 20px 14px;
+    }
+
+    .header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .search-box input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .cards {
+        gap: 12px;
+    }
+
+    .card {
+        padding: 17px;
+    }
+
+    .card h2 {
+        font-size: 27px;
+    }
+
+    .section,
+    .orders-section {
+        padding: 17px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 68px;
+        padding: 17px 7px;
+    }
+
+    .logo {
+        justify-content: center;
+        padding: 0 0 20px;
+    }
+
+    .logo h2,
+    .logo small,
+    .nav-label {
+        display: none;
+    }
+
+    .logo-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    nav a {
+        justify-content: center;
+        font-size: 0;
+        padding: 13px 5px;
+    }
+
+    nav a::first-letter {
+        font-size: 19px;
+    }
+
+    .main {
+        margin-left: 68px;
+        width: calc(100% - 68px);
+        padding: 18px 10px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .card-top {
+        margin-bottom: 12px;
+    }
+
+    .chart {
+        gap: 5px;
+    }
+
+    .month {
+        font-size: 9px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-icon">📦</div>
+        <div>
+            <h2>StockHub</h2>
+            <small>WAREHOUSE PRO</small>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-label">MAIN MENU</div>
+        <a href="index.html" class="active">🏠 Dashboard</a>
+        <a href="inventory.html">📦 Inventory</a>
+        <a href="orders.html">🛒 Orders</a>
+        <a href="suppliers.html">🚚 Suppliers</a>
+        <a href="customers.html">👥 Customers</a>
+        <div class="nav-label" style="margin-top:15px;">MANAGEMENT</div>
+        <a href="reports.html">📊 Reports</a>
+        <a href="notifications.html">🔔 Notifications</a>
+        <a href="activity.html">📝 Activity Log</a>
+        <a href="settings.html">⚙️ Settings</a>
+    </nav>
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <div class="eyebrow">WAREHOUSE MANAGEMENT</div>
+            <h1>Dashboard Overview ✨</h1>
+            <p>Welcome back! Here's your warehouse overview.</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="dashboardSearch"
+                   placeholder="🔍 Search products...">
+            <button id="searchBtn">Search</button>
+        </div>
+    </div>
+
+    <div class="cards">
+
+        <div class="card card-purple">
+            <div class="card-top">
+                <h3>Total Products</h3>
+                <div class="card-icon">📦</div>
+            </div>
+            <h2 id="totalProducts">0</h2>
+            <p>Unique products in inventory</p>
+        </div>
+
+        <div class="card card-pink">
+            <div class="card-top">
+                <h3>Total Stock</h3>
+                <div class="card-icon">📊</div>
+            </div>
+            <h2 id="totalStock">0</h2>
+            <p>Units available</p>
+        </div>
+
+        <div class="card card-orange">
+            <div class="card-top">
+                <h3>Low Stock</h3>
+                <div class="card-icon">⚠️</div>
+            </div>
+            <h2 id="lowStock">0</h2>
+            <p>Products needing attention</p>
+        </div>
+
+        <div class="card card-blue">
+            <div class="card-top">
+                <h3>Pending Orders</h3>
+                <div class="card-icon">🛒</div>
+            </div>
+            <h2 id="pendingOrders">0</h2>
+            <p>Orders awaiting completion</p>
+        </div>
+
+    </div>
+
+    <div class="dashboard-grid">
+
+        <section class="section">
+            <h2>📈 Orders Overview</h2>
+            <p class="section-subtitle">Monthly order performance</p>
+            <div class="chart" id="ordersChart">
+                <p class="empty-message">No order data available yet.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚠️ Low Stock Products</h2>
+            <p class="section-subtitle">Products that need attention</p>
+            <div id="lowStockList">
+                <p class="empty-message">No low-stock products.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <section class="orders-section">
+        <h2>🛍️ Recent Orders</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="recentOrders">
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No orders added yet.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<script>
+function readStorage(key) {
+    try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(value) ? value : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function getProducts() {
+    return readStorage("stockhubProducts");
+}
+
+function getOrders() {
+    return readStorage("stockhubOrders");
+}
+
+function getStock(product) {
+    const value = Number(
+        product.quantity ?? product.stock ?? product.qty ?? 0
+    );
+    return Number.isFinite(value) ? value : 0;
+}
+
+function getProductName(product) {
+    return product.name || product.productName ||
+           product.product || "Unnamed Product";
+}
+
+function getOrderStatus(order) {
+    return String(order.status || "Pending").toLowerCase();
+}
+
+function formatAmount(value) {
+    const amount = Number(value || 0);
+    return "₹" + amount.toLocaleString("en-IN");
+}
+
+function renderDashboard() {
+    const products = getProducts();
+    const orders = getOrders();
+
+    const totalStock = products.reduce(function(sum, product) {
+        return sum + getStock(product);
+    }, 0);
+
+    const lowStockProducts = products.filter(function(product) {
+        const quantity = getStock(product);
+        return quantity > 0 && quantity <= 10;
+    });
+
+    const pending = orders.filter(function(order) {
+        const status = getOrderStatus(order);
+        return status === "pending" || status === "processing";
+    });
+
+    document.getElementById("totalProducts").textContent =
+        products.length.toLocaleString("en-IN");
+
+    document.getElementById("totalStock").textContent =
+        totalStock.toLocaleString("en-IN");
+
+    document.getElementById("lowStock").textContent =
+        lowStockProducts.length.toLocaleString("en-IN");
+
+    document.getElementById("pendingOrders").textContent =
+        pending.length.toLocaleString("en-IN");
+
+    renderLowStock(lowStockProducts);
+    renderRecentOrders(orders);
+    renderOrdersChart(orders);
+}
+
+function renderLowStock(products) {
+    const container = document.getElementById("lowStockList");
+    container.replaceChildren();
+
+    if (products.length === 0) {
+        const message = document.createElement("p");
+        message.className = "empty-message";
+        message.textContent = "No low-stock products.";
+        container.appendChild(message);
+        return;
+    }
+
+    products.forEach(function(product) {
+        const row = document.createElement("div");
+        row.className = "product";
+
+        const name = document.createElement("span");
+        name.textContent = getProductName(product);
+
+        const quantity = document.createElement("span");
+        quantity.className = "low";
+        quantity.textContent = getStock(product) + " left";
+
+        row.append(name, quantity);
+        container.appendChild(row);
+    });
+}
+
+function renderRecentOrders(orders) {
+    const tbody = document.getElementById("recentOrders");
+    tbody.replaceChildren();
+
+    const recent = orders.slice(-5).reverse();
+
+    if (recent.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 5;
+        cell.className = "empty-message";
+        cell.textContent = "No orders added yet.";
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+    }
+
+    recent.forEach(function(order, index) {
+        const row = document.createElement("tr");
+
+        const id = order.id || order.orderId || ("ORD" + (index + 1));
+        const customer = order.customer || order.customerName || "—";
+        const product = order.product || order.productName || "—";
+        const amount = order.amount ?? order.total ?? order.price ?? 0;
+        const status = order.status || "Pending";
+        const normalized = String(status).toLowerCase();
+
+        [
+            String(id),
+            String(customer),
+            String(product),
+            formatAmount(amount)
+        ].forEach(function(value) {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        const statusCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = "status";
+
+        if (normalized === "delivered") {
+            badge.classList.add("delivered");
+        } else if (normalized === "shipped") {
+            badge.classList.add("shipped");
+        } else if (normalized === "processing") {
+            badge.classList.add("processing");
+        } else if (normalized === "cancelled") {
+            badge.classList.add("cancelled");
+        } else {
+            badge.classList.add("pending");
+        }
+
+        badge.textContent = status;
+        statusCell.appendChild(badge);
+        row.appendChild(statusCell);
+        tbody.appendChild(row);
+    });
+}
+
+function renderOrdersChart(orders) {
+    const chart = document.getElementById("ordersChart");
+    chart.replaceChildren();
+
+    if (orders.length === 0) {
+        const message = document.createElement("p");
+        message.className = "empty-message";
+        message.textContent = "No order data available yet.";
+        chart.appendChild(message);
+        return;
+    }
+
+    const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const monthlyCounts = Array(12).fill(0);
+
+    orders.forEach(function(order) {
+        const dateValue = order.date || order.createdAt;
+        const date = dateValue ? new Date(dateValue) : null;
+
+        if (date && !Number.isNaN(date.getTime())) {
+            monthlyCounts[date.getMonth()]++;
+        }
+    });
+
+    const maxCount = Math.max(...monthlyCounts, 1);
+
+    monthNames.forEach(function(month, index) {
+        const container = document.createElement("div");
+        container.className = "bar-container";
+
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.height =
+            (monthlyCounts[index] / maxCount * 180) + "px";
+        bar.title = month + ": " + monthlyCounts[index] + " orders";
+
+        const label = document.createElement("span");
+        label.className = "month";
+        label.textContent = month;
+
+        container.append(bar, label);
+        chart.appendChild(container);
+    });
+}
+
+function searchProducts() {
+    const query = document.getElementById("dashboardSearch")
+        .value.trim().toLowerCase();
+
+    if (!query) {
+        window.location.href = "inventory.html";
+        return;
+    }
+
+    const found = getProducts().filter(function(product) {
+        return getProductName(product).toLowerCase().includes(query);
+    });
+
+    if (found.length === 0) {
+        alert("No matching products found.");
+        return;
+    }
+
+    alert("Found products:\n" + found.map(function(product) {
+        return getProductName(product) + " — Stock: " + getStock(product);
+    }).join("\n"));
+}
+
+document.getElementById("searchBtn")
+    .addEventListener("click", searchProducts);
+
+document.getElementById("dashboardSearch")
+    .addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            searchProducts();
+        }
+    });
+
+/* Shared theme: Settings controls this page */
+function applyAppearance() {
+    const appearance = localStorage.getItem("stockhubAppearance") || "dark";
+
+    document.documentElement.classList.toggle(
+        "dark-mode",
+        appearance === "dark"
+    );
+
+    document.documentElement.classList.toggle(
+        "light-mode",
+        appearance === "light"
+    );
+}
+
+applyAppearance();
+renderDashboard();
+
+window.addEventListener("focus", function() {
+    applyAppearance();
+    renderDashboard();
+});
+
+window.addEventListener("storage", function(event) {
+    if (
+        event.key === "stockhubProducts" ||
+        event.key === "stockhubOrders"
+    ) {
+        renderDashboard();
+    }
+
+    if (event.key === "stockhubAppearance") {
+        applyAppearance();
+    }
+});
+</script>
+
+</body>
+</html>

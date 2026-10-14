@@ -1,0 +1,1264 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockHub - Orders</title>
+
+<script>
+(function () {
+    const theme = localStorage.getItem("stockhubAppearance") === "light"
+        ? "light"
+        : "dark";
+
+    document.documentElement.classList.toggle("light-mode", theme === "light");
+    document.documentElement.classList.toggle("dark-mode", theme === "dark");
+})();
+</script>
+
+<style>
+:root {
+    --bg: #100b1c;
+    --sidebar: #171026;
+    --card: #1d1530;
+    --card2: #251a3b;
+    --text: #f4efff;
+    --muted: #b5a8cc;
+    --border: #38284f;
+    --purple: #8b5cf6;
+    --violet: #a78bfa;
+    --input: #160f25;
+    --green: #34d399;
+    --red: #fb7185;
+    --yellow: #fbbf24;
+    --blue: #93c5fd;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background .25s, color .25s;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    width: 245px;
+    min-width: 245px;
+    min-height: 100vh;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    padding: 25px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin: 0 0 8px 10px;
+    color: var(--violet);
+}
+
+.logo span {
+    color: var(--text);
+}
+
+.tagline {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 0 0 32px 10px;
+}
+
+.nav-title {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 12px 10px;
+}
+
+nav a {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 13px 14px;
+    border-radius: 10px;
+    margin-bottom: 7px;
+    font-size: 14px;
+    transition: .2s;
+}
+
+nav a:hover {
+    background: var(--card2);
+    color: var(--text);
+}
+
+nav a.active {
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    color: #fff;
+    font-weight: bold;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px 10px 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* MAIN */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.top h1 {
+    font-size: 29px;
+    margin-bottom: 7px;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+button {
+    font-family: inherit;
+}
+
+.add-btn {
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: .2s;
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    color: white;
+    border: none;
+}
+
+.add-btn:hover {
+    opacity: .9;
+    transform: translateY(-1px);
+}
+
+/* SUMMARY CARDS */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 22px;
+    border-radius: 15px;
+    min-width: 0;
+}
+
+.card h3 {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: normal;
+    margin-bottom: 13px;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.card:nth-child(1) p { color: var(--violet); }
+.card:nth-child(2) p { color: var(--yellow); }
+.card:nth-child(3) p { color: var(--blue); }
+.card:nth-child(4) p { color: var(--green); }
+
+.card-note {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 9px;
+}
+
+/* TABLE PANEL */
+
+.table-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-header h2 {
+    font-size: 19px;
+}
+
+.table-header p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 7px;
+}
+
+.search {
+    width: 270px;
+    max-width: 100%;
+    padding: 12px 14px;
+    background: var(--input);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    outline: none;
+    font-size: 14px;
+}
+
+.search:focus,
+.order-input:focus,
+.order-select:focus {
+    border-color: var(--violet);
+    box-shadow: 0 0 0 2px rgba(139,92,246,.15);
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: var(--card2);
+}
+
+th, td {
+    text-align: left;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    color: var(--violet);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    white-space: nowrap;
+}
+
+td {
+    font-size: 13px;
+    color: var(--text);
+}
+
+tbody tr:hover {
+    background: rgba(139,92,246,.07);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.order-id {
+    font-weight: bold;
+    color: var(--violet);
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.pending {
+    background: rgba(251,191,36,.13);
+    color: var(--yellow);
+}
+
+.processing {
+    background: rgba(96,165,250,.13);
+    color: var(--blue);
+}
+
+.shipped {
+    background: rgba(167,139,250,.15);
+    color: var(--violet);
+}
+
+.delivered {
+    background: rgba(52,211,153,.13);
+    color: var(--green);
+}
+
+.cancelled {
+    background: rgba(251,113,133,.13);
+    color: var(--red);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 7px;
+}
+
+.view-btn, .delete-btn {
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.view-btn {
+    background: rgba(139,92,246,.13);
+    border: 1px solid var(--border);
+    color: var(--violet);
+}
+
+.delete-btn {
+    background: rgba(251,113,133,.1);
+    border: 1px solid var(--border);
+    color: var(--red);
+}
+
+.view-btn:hover, .delete-btn:hover {
+    opacity: .75;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 35px;
+}
+
+.footer {
+    margin-top: 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* NEW ORDER MODAL */
+
+#orderModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.72);
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 18px;
+    overflow-y: auto;
+}
+
+.order-modal-box {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 440px;
+    max-height: 95vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 21px;
+    color: var(--violet);
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 27px;
+    cursor: pointer;
+}
+
+.form-label {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    margin: 13px 0 7px;
+}
+
+.order-input, .order-select {
+    width: 100%;
+    padding: 12px;
+    background: var(--input);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.order-select option {
+    background: var(--card);
+    color: var(--text);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+}
+
+.cancel-btn {
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    background: var(--card2);
+    color: var(--text);
+}
+
+/* LIGHT MODE - CONTROLLED BY SETTINGS */
+
+html.light-mode {
+    --bg: #f5f3ff;
+    --sidebar: #ffffff;
+    --card: #ffffff;
+    --card2: #eee7ff;
+    --text: #26183b;
+    --muted: #6f6084;
+    --border: #e2d8f5;
+    --purple: #7c3aed;
+    --violet: #7040c8;
+    --input: #faf8ff;
+    --green: #07845d;
+    --red: #d63353;
+    --yellow: #a66a00;
+    --blue: #245fc4;
+}
+
+html.light-mode body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+html.light-mode nav a.active {
+    color: #fff;
+}
+
+html.light-mode .pending {
+    background: #fff4d5;
+}
+
+html.light-mode .processing {
+    background: #e3efff;
+}
+
+html.light-mode .shipped {
+    background: #eee7ff;
+}
+
+html.light-mode .delivered {
+    background: #e2f8ef;
+}
+
+html.light-mode .cancelled {
+    background: #ffe7ec;
+}
+
+html.light-mode #orderModal {
+    background: rgba(31,20,48,.45);
+}
+
+html.light-mode .cancel-btn {
+    color: #26183b;
+    background: #eee7ff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .main {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 760px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-width: 0;
+        min-height: auto;
+        padding: 18px;
+    }
+
+    .logo {
+        margin-bottom: 5px;
+    }
+
+    .tagline {
+        margin-bottom: 18px;
+    }
+
+    .nav-title, .sidebar-footer {
+        display: none;
+    }
+
+    nav {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    nav a {
+        flex-shrink: 0;
+        margin-bottom: 0;
+        padding: 10px 12px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 18px;
+    }
+
+    .top h1 {
+        font-size: 25px;
+    }
+
+    .top-actions {
+        width: 100%;
+    }
+
+    .top-actions button {
+        flex: 1;
+    }
+
+    .table-header {
+        padding: 17px;
+    }
+
+    .search {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .cards {
+        gap: 10px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .card p {
+        font-size: 23px;
+    }
+
+    .table-header {
+        align-items: stretch;
+    }
+
+    .order-modal-box {
+        padding: 19px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="logo">Stock<span>Hub</span></div>
+        <div class="tagline">Inventory Management System</div>
+
+        <div class="nav-title">Main Menu</div>
+
+        <nav>
+            <a href="index.html">🏠 Dashboard</a>
+            <a href="inventory.html">📦 Inventory</a>
+            <a href="orders.html" class="active">🛒 Orders</a>
+            <a href="suppliers.html">🚚 Suppliers</a>
+            <a href="customers.html">👥 Customers</a>
+            <a href="reports.html">📊 Reports</a>
+            <a href="notifications.html">🔔 Notifications</a>
+            <a href="activity.html">🕒 Activity Log</a>
+            <a href="settings.html">⚙️ Settings</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <strong>StockHub System</strong><br>
+            Order Management Panel<br>
+            © 2026 StockHub
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="top">
+            <div>
+                <h1>Orders Management</h1>
+                <p class="subtitle">Track, manage and monitor customer orders.</p>
+            </div>
+
+            <div class="top-actions">
+                <button class="add-btn" id="newOrderBtn" type="button">
+                    ＋ New Order
+                </button>
+            </div>
+        </header>
+
+        <!-- SUMMARY CARDS -->
+
+        <section class="cards">
+
+            <div class="card order-card">
+                <h3>Total Orders</h3>
+                <p id="totalOrders">0</p>
+                <div class="card-note">All recorded orders</div>
+            </div>
+
+            <div class="card order-card">
+                <h3>Pending Orders</h3>
+                <p id="pendingOrders">0</p>
+                <div class="card-note">Waiting for processing</div>
+            </div>
+
+            <div class="card order-card">
+                <h3>Shipped Orders</h3>
+                <p id="shippedOrders">0</p>
+                <div class="card-note">Orders dispatched</div>
+            </div>
+
+            <div class="card order-card">
+                <h3>Delivered Orders</h3>
+                <p id="deliveredOrders">0</p>
+                <div class="card-note">Successfully delivered</div>
+            </div>
+
+        </section>
+
+        <!-- ORDERS TABLE -->
+
+        <section class="table-box">
+
+            <div class="table-header">
+                <div>
+                    <h2>Recent Orders</h2>
+                    <p>View order details and delete orders when required.</p>
+                </div>
+
+                <input
+                    type="text"
+                    id="orderSearch"
+                    class="search"
+                    placeholder="🔍 Search orders...">
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <div class="footer">
+            StockHub Order Management System | All rights reserved.
+        </div>
+
+    </main>
+</div>
+
+<!-- NEW ORDER MODAL -->
+
+<div id="orderModal">
+    <div class="order-modal-box">
+
+        <div class="modal-header">
+            <h2>＋ New Order</h2>
+            <button class="close-btn" id="closeXBtn" type="button"
+                aria-label="Close">&times;</button>
+        </div>
+
+        <form id="orderForm">
+
+            <label class="form-label" for="customerName">Customer Name</label>
+            <input id="customerName" class="order-input"
+                type="text" placeholder="Enter customer name" required>
+
+            <label class="form-label" for="productName">Product Name</label>
+            <input id="productName" class="order-input"
+                type="text" placeholder="Enter product name" required>
+
+            <label class="form-label" for="orderAmount">Amount (₹)</label>
+            <input id="orderAmount" class="order-input"
+                type="number" placeholder="Enter amount"
+                min="0.01" step="0.01" required>
+
+            <label class="form-label" for="orderStatus">Order Status</label>
+            <select id="orderStatus" class="order-select">
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+
+            <div class="modal-buttons">
+                <button class="add-btn" type="submit">Save Order</button>
+                <button class="cancel-btn" id="closeOrderBtn" type="button">
+                    Cancel
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+/* DEFAULT ORDERS */
+
+const defaultOrders = [
+    {
+        id: "ORD1001",
+        customer: "Rahul Sharma",
+        product: "Wireless Mouse",
+        amount: 1200,
+        date: "04 Oct 2026",
+        status: "Pending"
+    },
+    {
+        id: "ORD1002",
+        customer: "Priya Patil",
+        product: "Mechanical Keyboard",
+        amount: 2500,
+        date: "03 Oct 2026",
+        status: "Shipped"
+    },
+    {
+        id: "ORD1003",
+        customer: "Amit Joshi",
+        product: "SSD 512GB",
+        amount: 4800,
+        date: "02 Oct 2026",
+        status: "Delivered"
+    },
+    {
+        id: "ORD1004",
+        customer: "Neha Kulkarni",
+        product: "Wireless Headphones",
+        amount: 1800,
+        date: "01 Oct 2026",
+        status: "Processing"
+    },
+    {
+        id: "ORD1005",
+        customer: "Rohit Deshmukh",
+        product: "Keyboard",
+        amount: 2500,
+        date: "30 Sep 2026",
+        status: "Cancelled"
+    }
+];
+
+const ordersStorageKey = "stockhubOrders";
+const countsStorageKey = "stockhubOrderCounts";
+
+/* SHARED THEME */
+
+function applyTheme() {
+    const theme = localStorage.getItem("stockhubAppearance") === "light"
+        ? "light"
+        : "dark";
+
+    document.documentElement.classList.toggle("light-mode", theme === "light");
+    document.documentElement.classList.toggle("dark-mode", theme === "dark");
+}
+
+window.addEventListener("storage", function(event) {
+    if (event.key === "stockhubAppearance") {
+        applyTheme();
+    }
+
+    if (event.key === ordersStorageKey || event.key === countsStorageKey) {
+        displayOrders();
+    }
+});
+
+window.addEventListener("focus", applyTheme);
+
+/* LOCAL STORAGE */
+
+function getOrders() {
+    try {
+        const saved = localStorage.getItem(ordersStorageKey);
+
+        if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            return Array.isArray(parsed) ? parsed : [];
+        }
+    } catch (error) {
+        console.error("Could not load orders:", error);
+    }
+
+    const initialOrders = defaultOrders.map(order => ({ ...order }));
+    saveOrders(initialOrders);
+    return initialOrders;
+}
+
+function saveOrders(orders) {
+    localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
+}
+
+function getCounts() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(countsStorageKey));
+
+        if (saved && typeof saved === "object") {
+            return saved;
+        }
+    } catch (error) {
+        console.error("Could not load order counts:", error);
+    }
+
+    const initialCounts = {
+        total: 356,
+        pending: 36,
+        shipped: 82,
+        delivered: 238
+    };
+
+    saveCounts(initialCounts);
+    return initialCounts;
+}
+
+function saveCounts(counts) {
+    localStorage.setItem(countsStorageKey, JSON.stringify(counts));
+}
+
+/* ACTIVITY LOG */
+
+function saveActivity(title, message, action, icon, color) {
+    try {
+        let activities = JSON.parse(
+            localStorage.getItem("stockhubActivities") || "[]"
+        );
+
+        if (!Array.isArray(activities)) {
+            activities = [];
+        }
+
+        activities.unshift({
+            title: title,
+            message: message,
+            category: "Orders",
+            action: action,
+            icon: icon,
+            color: color,
+            timestamp: new Date().toISOString(),
+            date: new Date().toLocaleString()
+        });
+
+        activities = activities.slice(0, 100);
+
+        localStorage.setItem(
+            "stockhubActivities",
+            JSON.stringify(activities)
+        );
+    } catch (error) {
+        console.error("Could not save activity:", error);
+    }
+}
+
+/* UPDATE SUMMARY CARDS */
+
+function updateCards() {
+    const counts = getCounts();
+
+    document.getElementById("totalOrders").textContent = counts.total ?? 0;
+    document.getElementById("pendingOrders").textContent = counts.pending ?? 0;
+    document.getElementById("shippedOrders").textContent = counts.shipped ?? 0;
+    document.getElementById("deliveredOrders").textContent = counts.delivered ?? 0;
+}
+
+/* STATUS CLASS */
+
+function getStatusClass(status) {
+    const classes = {
+        Pending: "pending",
+        Processing: "processing",
+        Shipped: "shipped",
+        Delivered: "delivered",
+        Cancelled: "cancelled"
+    };
+
+    return classes[status] || "pending";
+}
+
+/* DISPLAY ORDERS */
+
+function displayOrders() {
+    const orders = getOrders();
+    const tableBody = document.getElementById("ordersTableBody");
+
+    tableBody.innerHTML = "";
+
+    if (orders.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 7;
+        cell.className = "empty-state";
+        cell.textContent = "No orders found. Click New Order to add one.";
+
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+    } else {
+        orders.forEach(order => {
+            const row = document.createElement("tr");
+
+            function addCell(value, className = "") {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+
+                if (className) {
+                    cell.className = className;
+                }
+
+                row.appendChild(cell);
+                return cell;
+            }
+
+            addCell("#" + order.id, "order-id");
+            addCell(order.customer);
+            addCell(order.product);
+
+            addCell("₹" + Number(order.amount || 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }));
+
+            addCell(order.date);
+
+            const statusCell = document.createElement("td");
+            const statusBadge = document.createElement("span");
+
+            statusBadge.className = "status " + getStatusClass(order.status);
+            statusBadge.textContent = order.status;
+
+            statusCell.appendChild(statusBadge);
+            row.appendChild(statusCell);
+
+            const actionCell = document.createElement("td");
+            const actionButtons = document.createElement("div");
+
+            actionButtons.className = "action-buttons";
+
+            const viewButton = document.createElement("button");
+            viewButton.type = "button";
+            viewButton.className = "view-btn";
+            viewButton.textContent = "View";
+
+            viewButton.addEventListener("click", function() {
+                alert(
+                    "Order ID: #" + order.id +
+                    "\nCustomer: " + order.customer +
+                    "\nProduct: " + order.product +
+                    "\nAmount: ₹" + order.amount +
+                    "\nDate: " + order.date +
+                    "\nStatus: " + order.status
+                );
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "delete-btn";
+            deleteButton.textContent = "Delete";
+
+            deleteButton.addEventListener("click", function() {
+                deleteOrder(order.id);
+            });
+
+            actionButtons.appendChild(viewButton);
+            actionButtons.appendChild(deleteButton);
+            actionCell.appendChild(actionButtons);
+            row.appendChild(actionCell);
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    updateCards();
+    applySearch();
+}
+
+/* SEARCH ORDERS */
+
+function applySearch() {
+    const searchText = document.getElementById("orderSearch")
+        .value.trim().toLowerCase();
+
+    document.querySelectorAll("#ordersTableBody tr").forEach(row => {
+        row.style.display =
+            row.textContent.toLowerCase().includes(searchText) ? "" : "none";
+    });
+
+    document.querySelectorAll(".order-card").forEach(card => {
+        card.style.display = searchText ? "none" : "";
+    });
+}
+
+document.getElementById("orderSearch").addEventListener("input", applySearch);
+
+/* OPEN AND CLOSE MODAL */
+
+function openOrderModal() {
+    document.getElementById("orderForm").reset();
+    document.getElementById("orderModal").style.display = "flex";
+    document.getElementById("customerName").focus();
+}
+
+function closeOrderModal() {
+    document.getElementById("orderModal").style.display = "none";
+    document.getElementById("orderForm").reset();
+}
+
+document.getElementById("newOrderBtn").addEventListener("click", openOrderModal);
+document.getElementById("closeOrderBtn").addEventListener("click", closeOrderModal);
+document.getElementById("closeXBtn").addEventListener("click", closeOrderModal);
+
+document.getElementById("orderModal").addEventListener("click", function(event) {
+    if (event.target === this) {
+        closeOrderModal();
+    }
+});
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        closeOrderModal();
+    }
+});
+
+/* CREATE NEW ORDER */
+
+document.getElementById("orderForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const customer = document.getElementById("customerName").value.trim();
+    const product = document.getElementById("productName").value.trim();
+    const amount = Number(document.getElementById("orderAmount").value);
+    const status = document.getElementById("orderStatus").value;
+
+    if (!customer || !product) {
+        alert("Please enter the customer and product names.");
+        return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        alert("Please enter a valid amount greater than zero.");
+        return;
+    }
+
+    const orders = getOrders();
+
+    let highestNumber = 1000;
+
+    orders.forEach(order => {
+        const number = parseInt(String(order.id).replace(/^ORD/i, ""), 10);
+
+        if (Number.isFinite(number) && number > highestNumber) {
+            highestNumber = number;
+        }
+    });
+
+    const now = new Date();
+
+    const newOrder = {
+        id: "ORD" + (highestNumber + 1),
+        customer: customer,
+        product: product,
+        amount: amount,
+        date: now.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }),
+        status: status
+    };
+
+    orders.push(newOrder);
+    saveOrders(orders);
+
+    const counts = getCounts();
+
+    counts.total = (Number(counts.total) || 0) + 1;
+
+    if (status === "Pending") {
+        counts.pending = (Number(counts.pending) || 0) + 1;
+    }
+
+    if (status === "Shipped") {
+        counts.shipped = (Number(counts.shipped) || 0) + 1;
+    }
+
+    if (status === "Delivered") {
+        counts.delivered = (Number(counts.delivered) || 0) + 1;
+    }
+
+    saveCounts(counts);
+
+    saveActivity(
+        "Order Added",
+        "New order " + newOrder.id + " for " + customer + " was added.",
+        "Added",
+        "🛒",
+        "green"
+    );
+
+    closeOrderModal();
+    displayOrders();
+
+    alert("Order saved successfully!");
+});
+
+/* DELETE ORDER */
+
+function deleteOrder(orderId) {
+    const orders = getOrders();
+    const order = orders.find(item => item.id === orderId);
+
+    if (!order) {
+        alert("Order not found.");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Are you sure you want to delete order #" + order.id + "?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const updatedOrders = orders.filter(item => item.id !== orderId);
+    saveOrders(updatedOrders);
+
+    const counts = getCounts();
+
+    counts.total = Math.max(0, (Number(counts.total) || 0) - 1);
+
+    if (order.status === "Pending") {
+        counts.pending = Math.max(0, (Number(counts.pending) || 0) - 1);
+    }
+
+    if (order.status === "Shipped") {
+        counts.shipped = Math.max(0, (Number(counts.shipped) || 0) - 1);
+    }
+
+    if (order.status === "Delivered") {
+        counts.delivered = Math.max(0, (Number(counts.delivered) || 0) - 1);
+    }
+
+    saveCounts(counts);
+
+    saveActivity(
+        "Order Deleted",
+        "Order " + order.id + " for " + order.customer + " was deleted.",
+        "Deleted",
+        "🗑️",
+        "red"
+    );
+
+    displayOrders();
+}
+
+/* INITIALIZE */
+
+applyTheme();
+displayOrders();
+
+</script>
+</body>
+</html>

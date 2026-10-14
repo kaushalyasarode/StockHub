@@ -1,0 +1,114 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>StockHub - Welcome</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #171323;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: appear 1.2s ease-in-out;
+        }
+
+        .logo {
+            width: 110px;
+            height: 110px;
+            background: #28213b;
+            border: 1px solid #51436e;
+            border-radius: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            margin-bottom: 22px;
+            box-shadow: 0 0 35px rgba(124, 58, 237, 0.18);
+        }
+
+        .brand {
+            font-size: 52px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #ffffff;
+        }
+
+        .tagline {
+            margin-top: 12px;
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: #b9a9df;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .brand {
+                font-size: 40px;
+            }
+
+            .logo {
+                width: 90px;
+                height: 90px;
+                font-size: 48px;
+            }
+
+            .tagline {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="logo-container">
+        <div class="logo">📦</div>
+
+        <div class="brand">StockHub</div>
+
+        <div class="tagline">
+            SMART WAREHOUSE MANAGEMENT
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                window.location.href = "./features.html";
+            }, 10000);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,897 @@
+ ```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockHub - Activity Log</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f7f7fc;
+    color:#333;
+    transition:background .25s,color .25s;
+}
+
+/* Sidebar */
+.sidebar{
+    width:240px;
+    height:100vh;
+    background:#fff;
+    color:#25243a;
+    position:fixed;
+    left:0;
+    top:0;
+    padding:20px;
+    border-right:1px solid #e9e7f2;
+    box-shadow:2px 0 10px rgba(40,30,80,.04);
+    overflow-y:auto;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:30px;
+    color:#6048a3;
+}
+
+.sidebar a{
+    display:block;
+    color:#55546b;
+    text-decoration:none;
+    padding:13px 10px;
+    margin-bottom:5px;
+    border-radius:8px;
+    transition:.2s;
+}
+
+.sidebar a:hover{
+    background:#f3f0ff;
+    color:#6048a3;
+}
+
+.sidebar a.active{
+    background:#e9e2ff;
+    color:#6048a3;
+    font-weight:bold;
+}
+
+/* Main */
+.main{
+    margin-left:240px;
+    padding:30px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.header h1{
+    font-size:28px;
+    color:#28243d;
+}
+
+.search{
+    padding:11px 15px;
+    width:230px;
+    max-width:100%;
+    border:1px solid #ddd9ee;
+    border-radius:8px;
+    outline:none;
+    background:#fff;
+    color:#333;
+}
+
+.search:focus{
+    border-color:#8b75d6;
+}
+
+/* Summary Cards */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:#fff;
+    padding:22px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(40,30,80,.07);
+    border:1px solid #efedf7;
+}
+
+.card h3{
+    color:#77738d;
+    font-size:15px;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:27px;
+    font-weight:bold;
+    color:#6048a3;
+}
+
+/* Activity Box */
+.activity-box{
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(40,30,80,.07);
+    border:1px solid #efedf7;
+    overflow:hidden;
+}
+
+.activity-header{
+    padding:20px 25px;
+    border-bottom:1px solid #eeeaf7;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.activity-header h2{
+    font-size:20px;
+    color:#302b48;
+}
+
+.filter{
+    padding:8px 12px;
+    border:1px solid #ddd9ee;
+    border-radius:7px;
+    background:#fff;
+    color:#454057;
+    outline:none;
+}
+
+/* Activity Item */
+.activity{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:20px 25px;
+    border-bottom:1px solid #eeeaf7;
+    cursor:pointer;
+    transition:background .2s;
+}
+
+.activity:hover{
+    background:#f8f6ff;
+}
+
+.activity:last-child{
+    border-bottom:none;
+}
+
+.icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:21px;
+    flex-shrink:0;
+}
+
+.blue{background:#dbeafe;}
+.green{background:#dcfce7;}
+.orange{background:#ffedd5;}
+.purple{background:#ede9fe;}
+.red{background:#fee2e2;}
+
+.activity-content{
+    flex:1;
+    min-width:0;
+}
+
+.activity-content h3{
+    font-size:15px;
+    margin-bottom:6px;
+    color:#302b48;
+}
+
+.activity-content p{
+    color:#77738d;
+    font-size:13px;
+    overflow-wrap:anywhere;
+    line-height:1.5;
+}
+
+.time{
+    color:#9994aa;
+    font-size:12px;
+    white-space:nowrap;
+    text-align:right;
+}
+
+.empty{
+    text-align:center;
+    padding:50px 20px;
+    color:#9994aa;
+}
+
+.empty-icon{
+    font-size:45px;
+    margin-bottom:12px;
+}
+
+.empty h3{
+    color:#6b6680;
+    margin-bottom:6px;
+}
+
+/* Popup */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:1000;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-content{
+    width:100%;
+    max-width:480px;
+    background:#fff;
+    color:#333;
+    border-radius:15px;
+    padding:28px;
+    position:relative;
+    box-shadow:0 10px 35px rgba(0,0,0,.2);
+    animation:popupOpen .2s ease;
+}
+
+@keyframes popupOpen{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+.close-btn{
+    position:absolute;
+    top:12px;
+    right:16px;
+    border:none;
+    background:transparent;
+    font-size:28px;
+    color:#77738d;
+    cursor:pointer;
+}
+
+.popup-icon{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:27px;
+    margin-bottom:18px;
+}
+
+.modal-content h2{
+    font-size:22px;
+    margin-bottom:12px;
+    padding-right:20px;
+    overflow-wrap:anywhere;
+    color:#302b48;
+}
+
+.popup-message{
+    color:#55546b;
+    line-height:1.6;
+    margin-bottom:20px;
+    overflow-wrap:anywhere;
+}
+
+.popup-details{
+    border-top:1px solid #eeeaf7;
+    padding-top:15px;
+}
+
+.popup-details p{
+    margin-bottom:12px;
+    font-size:14px;
+    color:#55546b;
+    overflow-wrap:anywhere;
+}
+
+.popup-details strong{
+    color:#302b48;
+}
+
+.close-bottom{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    background:#7056b5;
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.close-bottom:hover{
+    background:#6048a3;
+}
+
+/* ================= DARK MODE ================= */
+
+body.dark-mode{
+    background:#11121e;
+    color:#e7e5f2;
+}
+
+body.dark-mode .sidebar{
+    background:#191a30;
+    color:#eeeafa;
+    border-right-color:#292943;
+    box-shadow:none;
+}
+
+body.dark-mode .logo{
+    color:#c5b5ff;
+}
+
+body.dark-mode .sidebar a{
+    color:#c7c5d8;
+}
+
+body.dark-mode .sidebar a:hover{
+    background:#28243f;
+    color:#d4c7ff;
+}
+
+body.dark-mode .sidebar a.active{
+    background:#423365;
+    color:#e2d8ff;
+}
+
+body.dark-mode .header h1,
+body.dark-mode .activity-header h2,
+body.dark-mode .activity-content h3,
+body.dark-mode .modal-content h2{
+    color:#eeeafa;
+}
+
+body.dark-mode .card,
+body.dark-mode .activity-box{
+    background:#191a2b;
+    border-color:#292943;
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+body.dark-mode .card h3,
+body.dark-mode .activity-content p{
+    color:#aaa8c0;
+}
+
+body.dark-mode .card p{
+    color:#c5b5ff;
+}
+
+body.dark-mode .activity-header,
+body.dark-mode .activity{
+    border-bottom-color:#2c2b43;
+}
+
+body.dark-mode .activity:hover{
+    background:#222239;
+}
+
+body.dark-mode .filter,
+body.dark-mode .search{
+    background:#191a2b;
+    color:#eeeafa;
+    border-color:#383650;
+}
+
+body.dark-mode .search::placeholder{
+    color:#9996b0;
+}
+
+body.dark-mode .time,
+body.dark-mode .empty{
+    color:#aaa8c0;
+}
+
+body.dark-mode .empty h3{
+    color:#d5d2e5;
+}
+
+body.dark-mode .modal-content{
+    background:#191a2b;
+    color:#eeeafa;
+}
+
+body.dark-mode .close-btn{
+    color:#c7c5d8;
+}
+
+body.dark-mode .popup-message,
+body.dark-mode .popup-details p{
+    color:#c7c5d8;
+}
+
+body.dark-mode .popup-details{
+    border-top-color:#2c2b43;
+}
+
+body.dark-mode .popup-details strong{
+    color:#eeeafa;
+}
+
+/* Responsive */
+@media(max-width:1000px){
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px){
+    .sidebar{
+        width:190px;
+        padding:15px;
+    }
+
+    .main{
+        margin-left:190px;
+        padding:18px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .activity{
+        padding:16px;
+        gap:12px;
+    }
+
+    .icon{
+        width:40px;
+        height:40px;
+        font-size:18px;
+    }
+
+    .time{
+        display:none;
+    }
+
+    .search{
+        width:100%;
+    }
+
+    .modal-content{
+        padding:23px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">📦 StockHub</div>
+
+    <a href="index.html">🏠 Dashboard</a>
+    <a href="inventory.html">📦 Inventory</a>
+    <a href="orders.html">🛒 Orders</a>
+    <a href="suppliers.html">🚚 Suppliers</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="reports.html">📊 Reports</a>
+    <a href="notifications.html">🔔 Notifications</a>
+    <a href="activity.html" class="active">📝 Activity Log</a>
+    <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <div class="header">
+        <h1>Activity Log</h1>
+
+        <input
+            class="search"
+            id="activitySearch"
+            type="text"
+            placeholder="Search activity..."
+        >
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Activities</h3>
+            <p id="totalActivities">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Today's Activities</h3>
+            <p id="todayActivities">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Added</h3>
+            <p id="addedActivities">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Updated</h3>
+            <p id="updatedActivities">0</p>
+        </div>
+
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-box">
+
+        <div class="activity-header">
+            <h2>📝 Recent Activity</h2>
+
+            <select class="filter" id="activityFilter">
+                <option value="All">All Activities</option>
+                <option value="Orders">Orders</option>
+                <option value="Inventory">Inventory</option>
+                <option value="Customers">Customers</option>
+                <option value="Suppliers">Suppliers</option>
+            </select>
+        </div>
+
+        <div id="activityList"></div>
+
+    </div>
+</div>
+
+<!-- Activity Details Popup -->
+<div class="modal" id="activityModal"
+     role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+
+    <div class="modal-content">
+
+        <button class="close-btn" id="popupCloseX"
+                aria-label="Close popup">&times;</button>
+
+        <div class="popup-icon blue" id="popupIcon">📝</div>
+
+        <h2 id="popupTitle">Activity Details</h2>
+
+        <p class="popup-message" id="popupMessage"></p>
+
+        <div class="popup-details">
+            <p><strong>Category:</strong> <span id="popupCategory"></span></p>
+            <p><strong>Action:</strong> <span id="popupAction"></span></p>
+            <p><strong>Date:</strong> <span id="popupDate"></span></p>
+            <p><strong>Time:</strong> <span id="popupTime"></span></p>
+        </div>
+
+        <button class="close-bottom" id="popupCloseButton">Close</button>
+
+    </div>
+</div>
+
+<script>
+const activityStorageKey = "stockhubActivities";
+const appearanceKey = "stockhubAppearance";
+
+let activities = [];
+
+/* Apply shared Dark Mode - no extra button */
+function applyTheme(theme){
+    document.body.classList.toggle(
+        "dark-mode",
+        theme === "dark"
+    );
+}
+
+applyTheme(localStorage.getItem(appearanceKey) || "light");
+
+/* Load Activities */
+function loadActivities(){
+    const savedActivities = localStorage.getItem(activityStorageKey);
+
+    if(savedActivities){
+        try{
+            const parsedActivities = JSON.parse(savedActivities);
+            activities = Array.isArray(parsedActivities)
+                ? parsedActivities
+                : [];
+        }catch(error){
+            activities = [];
+        }
+    }else{
+        activities = [];
+    }
+
+    updateCards();
+    displayActivities();
+}
+
+/* Update Summary Cards */
+function updateCards(){
+    const total = activities.length;
+    const today = new Date().toDateString();
+
+    const todayCount = activities.filter(function(activity){
+        if(!activity.timestamp) return false;
+
+        const date = new Date(activity.timestamp);
+
+        return !isNaN(date.getTime()) &&
+            date.toDateString() === today;
+    }).length;
+
+    const added = activities.filter(function(activity){
+        return String(activity.action || "")
+            .trim().toLowerCase() === "added";
+    }).length;
+
+    const updated = activities.filter(function(activity){
+        return String(activity.action || "")
+            .trim().toLowerCase() === "updated";
+    }).length;
+
+    document.getElementById("totalActivities").textContent = total;
+    document.getElementById("todayActivities").textContent = todayCount;
+    document.getElementById("addedActivities").textContent = added;
+    document.getElementById("updatedActivities").textContent = updated;
+}
+
+/* Escape HTML */
+function escapeHTML(text){
+    if(text === undefined || text === null) return "";
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+/* Display Activities */
+function displayActivities(){
+    const list = document.getElementById("activityList");
+
+    const searchText = document
+        .getElementById("activitySearch")
+        .value.toLowerCase().trim();
+
+    const selectedFilter =
+        document.getElementById("activityFilter").value;
+
+    const filteredActivities = activities
+        .filter(function(activity){
+            const searchData = (
+                (activity.title || "") + " " +
+                (activity.message || "") + " " +
+                (activity.category || "") + " " +
+                (activity.action || "")
+            ).toLowerCase();
+
+            const matchesSearch = searchData.includes(searchText);
+
+            const matchesFilter =
+                selectedFilter === "All" ||
+                activity.category === selectedFilter;
+
+            return matchesSearch && matchesFilter;
+        })
+        .sort(function(a,b){
+            const dateA = new Date(a.timestamp || 0).getTime() || 0;
+            const dateB = new Date(b.timestamp || 0).getTime() || 0;
+
+            return dateB - dateA;
+        });
+
+    if(filteredActivities.length === 0){
+        list.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">📝</div>
+                <h3>No activities found</h3>
+                <p>Activities will appear here when you add, update or delete data.</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.innerHTML = filteredActivities.map(function(activity){
+        const originalIndex = activities.indexOf(activity);
+
+        const date = activity.timestamp
+            ? new Date(activity.timestamp)
+            : null;
+
+        const validDate = date && !isNaN(date.getTime());
+
+        const dateText = validDate
+            ? date.toLocaleDateString("en-GB",{
+                day:"2-digit",
+                month:"short",
+                year:"numeric"
+            })
+            : "Date unavailable";
+
+        const timeText = validDate
+            ? date.toLocaleTimeString("en-US",{
+                hour:"2-digit",
+                minute:"2-digit"
+            })
+            : "Time unavailable";
+
+        const color = ["blue","green","orange","purple","red"]
+            .includes(activity.color)
+            ? activity.color
+            : "blue";
+
+        return `
+            <div class="activity"
+                 data-activity-index="${originalIndex}"
+                 tabindex="0"
+                 role="button"
+                 aria-label="View activity details">
+
+                <div class="icon ${color}">
+                    ${escapeHTML(activity.icon || "📝")}
+                </div>
+
+                <div class="activity-content">
+                    <h3>${escapeHTML(activity.title || "Activity")}</h3>
+                    <p>${escapeHTML(activity.message || "No additional message.")}</p>
+                </div>
+
+                <div class="time">
+                    ${dateText}<br>${timeText}
+                </div>
+
+            </div>
+        `;
+    }).join("");
+
+    list.querySelectorAll(".activity").forEach(function(item){
+
+        item.addEventListener("click",function(){
+            openActivityPopup(Number(item.dataset.activityIndex));
+        });
+
+        item.addEventListener("keydown",function(event){
+            if(event.key === "Enter" || event.key === " "){
+                event.preventDefault();
+                openActivityPopup(Number(item.dataset.activityIndex));
+            }
+        });
+    });
+}
+
+/* Open Activity Popup */
+function openActivityPopup(index){
+    const activity = activities[index];
+
+    if(!activity) return;
+
+    const date = activity.timestamp
+        ? new Date(activity.timestamp)
+        : null;
+
+    const validDate = date && !isNaN(date.getTime());
+
+    document.getElementById("popupIcon").textContent =
+        activity.icon || "📝";
+
+    document.getElementById("popupIcon").className =
+        "popup-icon " +
+        (["blue","green","orange","purple","red"]
+            .includes(activity.color)
+            ? activity.color
+            : "blue");
+
+    document.getElementById("popupTitle").textContent =
+        activity.title || "Activity Details";
+
+    document.getElementById("popupMessage").textContent =
+        activity.message || "No additional message is available.";
+
+    document.getElementById("popupCategory").textContent =
+        activity.category || "General";
+
+    document.getElementById("popupAction").textContent =
+        activity.action || "Not specified";
+
+    document.getElementById("popupDate").textContent =
+        validDate
+            ? date.toLocaleDateString("en-GB",{
+                day:"2-digit",
+                month:"long",
+                year:"numeric"
+            })
+            : "Date unavailable";
+
+    document.getElementById("popupTime").textContent =
+        validDate
+            ? date.toLocaleTimeString("en-US",{
+                hour:"2-digit",
+                minute:"2-digit",
+                second:"2-digit"
+            })
+            : "Time unavailable";
+
+    document.getElementById("activityModal").classList.add("show");
+}
+
+/* Close Popup */
+function closeActivityPopup(){
+    document.getElementById("activityModal").classList.remove("show");
+}
+
+document.getElementById("popupCloseX")
+    .addEventListener("click",closeActivityPopup);
+
+document.getElementById("popupCloseButton")
+    .addEventListener("click",closeActivityPopup);
+
+document.getElementById("activityModal")
+    .addEventListener("click",function(event){
+        if(event.target === this){
+            closeActivityPopup();
+        }
+    });
+
+document.addEventListener("keydown",function(event){
+    if(event.key === "Escape"){
+        closeActivityPopup();
+    }
+});
+
+/* Search */
+document.getElementById("activitySearch")
+    .addEventListener("input",displayActivities);
+
+/* Filter */
+document.getElementById("activityFilter")
+    .addEventListener("change",displayActivities);
+
+/* Sync Theme and Activity Data Across Tabs */
+window.addEventListener("storage",function(event){
+
+    if(event.key === appearanceKey){
+        applyTheme(localStorage.getItem(appearanceKey) || "light");
+    }
+
+    if(event.key === activityStorageKey){
+        loadActivities();
+    }
+});
+
+/* Initial Load */
+loadActivities();
+</script>
+
+</body>
+</html>
+```

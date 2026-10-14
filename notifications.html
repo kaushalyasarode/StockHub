@@ -1,0 +1,1087 @@
+ ```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockHub - Notifications</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f7f7fc;
+    color:#333;
+    transition:background .25s,color .25s;
+}
+
+/* Sidebar */
+.sidebar{
+    width:240px;
+    height:100vh;
+    background:#fff;
+    color:#25243a;
+    position:fixed;
+    left:0;
+    top:0;
+    padding:20px;
+    border-right:1px solid #e9e7f2;
+    box-shadow:2px 0 10px rgba(40,30,80,.04);
+    overflow-y:auto;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:30px;
+    color:#6048a3;
+}
+
+.sidebar a{
+    display:block;
+    color:#55546b;
+    text-decoration:none;
+    padding:13px 10px;
+    margin-bottom:5px;
+    border-radius:8px;
+    transition:.2s;
+}
+
+.sidebar a:hover{
+    background:#f3f0ff;
+    color:#6048a3;
+}
+
+.sidebar a.active{
+    background:#e9e2ff;
+    color:#6048a3;
+    font-weight:bold;
+}
+
+/* Main */
+.main{
+    margin-left:240px;
+    padding:30px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.header h1{
+    font-size:28px;
+    color:#28243d;
+}
+
+.search{
+    padding:11px 15px;
+    width:230px;
+    border:1px solid #ddd9ee;
+    border-radius:8px;
+    outline:none;
+    background:#fff;
+    color:#333;
+}
+
+.search:focus{
+    border-color:#8b75d6;
+}
+
+/* Cards */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:#fff;
+    padding:22px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(40,30,80,.07);
+    border:1px solid #efedf7;
+}
+
+.card h3{
+    color:#77738d;
+    font-size:15px;
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:27px;
+    font-weight:bold;
+    color:#6048a3;
+}
+
+/* Notification Box */
+.notification-box{
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(40,30,80,.07);
+    border:1px solid #efedf7;
+    overflow:hidden;
+}
+
+.notification-header{
+    padding:20px 25px;
+    border-bottom:1px solid #eeeaf7;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
+
+.notification-header h2{
+    font-size:20px;
+    color:#302b48;
+}
+
+.mark-read{
+    color:#7056b5;
+    font-size:14px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.mark-read:hover{
+    text-decoration:underline;
+}
+
+/* Notification */
+.notification{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:20px 25px;
+    border-bottom:1px solid #eeeaf7;
+    cursor:pointer;
+    transition:background .2s;
+}
+
+.notification:hover{
+    background:#f8f6ff;
+}
+
+.notification:last-child{
+    border-bottom:none;
+}
+
+.icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+    flex-shrink:0;
+}
+
+.red{background:#fee2e2;}
+.green{background:#dcfce7;}
+.blue{background:#dbeafe;}
+.orange{background:#ffedd5;}
+.purple{background:#ede9fe;}
+
+.notification-content{
+    flex:1;
+    min-width:0;
+}
+
+.notification-content h3{
+    font-size:15px;
+    margin-bottom:6px;
+    color:#302b48;
+}
+
+.notification-content p{
+    color:#77738d;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.time{
+    color:#9994aa;
+    font-size:12px;
+    white-space:nowrap;
+}
+
+/* Unread */
+.unread{
+    background:#f3f0ff;
+}
+
+.unread .notification-content h3{
+    font-weight:bold;
+    color:#6048a3;
+}
+
+/* No Result */
+.no-result{
+    text-align:center;
+    padding:40px;
+    color:#9994aa;
+    font-size:15px;
+}
+
+/* Popup */
+.modal{
+    display:none;
+    position:fixed;
+    z-index:1000;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.55);
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.modal-box{
+    width:450px;
+    max-width:100%;
+    background:#fff;
+    color:#333;
+    border-radius:15px;
+    box-shadow:0 10px 35px rgba(0,0,0,.25);
+    overflow:hidden;
+    animation:popupShow .2s ease;
+}
+
+@keyframes popupShow{
+    from{transform:scale(.9);opacity:0;}
+    to{transform:scale(1);opacity:1;}
+}
+
+.modal-header{
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    border-bottom:1px solid #eeeaf7;
+}
+
+.modal-icon{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:25px;
+    flex-shrink:0;
+}
+
+.modal-header h2{
+    font-size:19px;
+    color:#302b48;
+}
+
+.modal-body{
+    padding:25px;
+}
+
+.modal-message{
+    font-size:15px;
+    color:#55546b;
+    line-height:1.6;
+    margin-bottom:22px;
+}
+
+.date-time{
+    background:#f5f2ff;
+    border-radius:10px;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.date-row,
+.time-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#454057;
+    font-size:14px;
+}
+
+.modal-footer{
+    padding:15px 25px 20px;
+    text-align:right;
+}
+
+.close-btn{
+    background:#7056b5;
+    color:white;
+    border:none;
+    padding:10px 22px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.close-btn:hover{
+    background:#6048a3;
+}
+
+/* ================= DARK MODE ================= */
+
+body.dark-mode{
+    background:#11121e;
+    color:#e7e5f2;
+}
+
+body.dark-mode .sidebar{
+    background:#191a30;
+    color:#eeeafa;
+    border-right-color:#292943;
+    box-shadow:none;
+}
+
+body.dark-mode .logo{
+    color:#c5b5ff;
+}
+
+body.dark-mode .sidebar a{
+    color:#c7c5d8;
+}
+
+body.dark-mode .sidebar a:hover{
+    background:#28243f;
+    color:#d4c7ff;
+}
+
+body.dark-mode .sidebar a.active{
+    background:#423365;
+    color:#e2d8ff;
+}
+
+body.dark-mode .header h1,
+body.dark-mode .notification-header h2,
+body.dark-mode .notification-content h3,
+body.dark-mode .modal-header h2{
+    color:#eeeafa;
+}
+
+body.dark-mode .card,
+body.dark-mode .notification-box{
+    background:#191a2b;
+    border-color:#292943;
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+body.dark-mode .card h3,
+body.dark-mode .notification-content p{
+    color:#aaa8c0;
+}
+
+body.dark-mode .card p{
+    color:#c5b5ff;
+}
+
+body.dark-mode .notification-header,
+body.dark-mode .notification{
+    border-bottom-color:#2c2b43;
+}
+
+body.dark-mode .notification:hover{
+    background:#222239;
+}
+
+body.dark-mode .unread{
+    background:#24213b;
+}
+
+body.dark-mode .unread .notification-content h3{
+    color:#d4c7ff;
+}
+
+body.dark-mode .mark-read{
+    color:#c5b5ff;
+}
+
+body.dark-mode .search{
+    background:#191a2b;
+    color:#eeeafa;
+    border-color:#383650;
+}
+
+body.dark-mode .search::placeholder{
+    color:#9996b0;
+}
+
+body.dark-mode .modal-box{
+    background:#191a2b;
+    color:#eeeafa;
+}
+
+body.dark-mode .modal-header{
+    border-bottom-color:#2c2b43;
+}
+
+body.dark-mode .modal-message{
+    color:#c7c5d8;
+}
+
+body.dark-mode .date-time{
+    background:#222239;
+}
+
+body.dark-mode .date-row,
+body.dark-mode .time-row{
+    color:#d5d2e5;
+}
+
+body.dark-mode .no-result,
+body.dark-mode .time{
+    color:#aaa8c0;
+}
+
+/* Responsive */
+@media(max-width:900px){
+    .cards{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:600px){
+    .sidebar{
+        width:190px;
+        padding:15px;
+    }
+
+    .main{
+        margin-left:190px;
+        padding:20px 15px;
+    }
+
+    .notification{
+        padding:15px;
+        gap:10px;
+    }
+
+    .icon{
+        width:40px;
+        height:40px;
+        font-size:18px;
+    }
+
+    .time{
+        display:none;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .search{
+        width:100%;
+    }
+
+    .notification-header{
+        padding:16px;
+        flex-wrap:wrap;
+    }
+
+    .notification-header h2{
+        font-size:17px;
+    }
+
+    .modal-box{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">📦 StockHub</div>
+
+    <a href="index.html">🏠 Dashboard</a>
+    <a href="inventory.html">📦 Inventory</a>
+    <a href="orders.html">🛒 Orders</a>
+    <a href="suppliers.html">🚚 Suppliers</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="reports.html">📊 Reports</a>
+    <a href="notifications.html" class="active">🔔 Notifications</a>
+    <a href="activity.html">📝 Activity Log</a>
+    <a href="settings.html">⚙️ Settings</a>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <div class="header">
+        <h1>Notifications</h1>
+
+        <input
+            class="search"
+            id="notificationSearch"
+            type="text"
+            placeholder="Search notifications..."
+        >
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Notifications</h3>
+            <p id="totalNotifications">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Unread</h3>
+            <p id="unreadNotifications">0</p>
+        </div>
+
+        <div class="card">
+            <h3>Alerts</h3>
+            <p id="alertNotifications">0</p>
+        </div>
+
+    </div>
+
+    <!-- Notifications -->
+    <div class="notification-box">
+
+        <div class="notification-header">
+            <h2>🔔 Recent Notifications</h2>
+
+            <span class="mark-read" id="markAllRead">
+                Mark all as read
+            </span>
+        </div>
+
+        <div id="notificationList"></div>
+
+    </div>
+
+</div>
+
+<!-- Notification Popup -->
+<div class="modal" id="notificationModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <div class="modal-icon" id="modalIcon">🔔</div>
+            <h2 id="modalTitle">Notification</h2>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="modal-message" id="modalMessage">
+                Notification message
+            </div>
+
+            <div class="date-time">
+
+                <div class="date-row">
+                    <span>📅</span>
+                    <strong>Date:</strong>
+                    <span id="modalDate">-</span>
+                </div>
+
+                <div class="time-row">
+                    <span>🕐</span>
+                    <strong>Time:</strong>
+                    <span id="modalTime">-</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="close-btn" id="closeModal">Close</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* Existing Storage Keys */
+const readStorageKey = "stockhubReadNotifications";
+const timeStorageKey = "stockhubNotificationTimes";
+const appearanceKey = "stockhubAppearance";
+
+/* Apply shared theme - no extra button */
+function applyTheme(theme){
+    document.body.classList.toggle(
+        "dark-mode",
+        theme === "dark"
+    );
+}
+
+/* Load saved theme */
+applyTheme(localStorage.getItem(appearanceKey) || "light");
+
+/* Read Products */
+function getProducts(){
+    try{
+        return JSON.parse(
+            localStorage.getItem("stockhubProducts")
+        ) || [];
+    }catch(error){
+        return [];
+    }
+}
+
+/* Read Orders */
+function getOrders(){
+    try{
+        return JSON.parse(
+            localStorage.getItem("stockhubOrders")
+        ) || [];
+    }catch(error){
+        return [];
+    }
+}
+
+/* Read Customers */
+function getCustomers(){
+    try{
+        return JSON.parse(
+            localStorage.getItem("stockhubCustomers")
+        ) || [];
+    }catch(error){
+        return [];
+    }
+}
+
+/* Read Notifications */
+function getReadNotifications(){
+    try{
+        return JSON.parse(
+            localStorage.getItem(readStorageKey)
+        ) || [];
+    }catch(error){
+        return [];
+    }
+}
+
+function saveReadNotifications(ids){
+    localStorage.setItem(
+        readStorageKey,
+        JSON.stringify(ids)
+    );
+}
+
+/* Notification Times */
+function getNotificationTimes(){
+    try{
+        return JSON.parse(
+            localStorage.getItem(timeStorageKey)
+        ) || {};
+    }catch(error){
+        return {};
+    }
+}
+
+function saveNotificationTimes(times){
+    localStorage.setItem(
+        timeStorageKey,
+        JSON.stringify(times)
+    );
+}
+
+/* Format Date */
+function formatDate(date){
+    return date.toLocaleDateString("en-GB",{
+        day:"2-digit",
+        month:"short",
+        year:"numeric"
+    });
+}
+
+/* Format Time */
+function formatTime(date){
+    return date.toLocaleTimeString("en-US",{
+        hour:"2-digit",
+        minute:"2-digit",
+        hour12:true
+    });
+}
+
+/* Get Saved Date and Time */
+function getNotificationDateTime(id){
+    const times = getNotificationTimes();
+
+    if(!times[id]){
+        const now = new Date();
+
+        times[id] = {
+            date:formatDate(now),
+            time:formatTime(now)
+        };
+
+        saveNotificationTimes(times);
+    }
+
+    return times[id];
+}
+
+/* Create Notifications */
+function createNotifications(){
+
+    const products = getProducts();
+    const orders = getOrders();
+    const customers = getCustomers();
+
+    const notifications = [];
+
+    /* Low Stock Alerts */
+    products.forEach((product,index)=>{
+
+        const quantity = Number(product.quantity);
+
+        if(!isNaN(quantity) && quantity <= 10){
+
+            const id = "low-stock-" + (product.id || index);
+            const dateTime = getNotificationDateTime(id);
+
+            notifications.push({
+                id:id,
+                type:"alert",
+                icon:"⚠️",
+                color:"red",
+                title:"Low Stock Alert",
+                message:(product.name || "Product") +
+                    " has only " + quantity + " units left.",
+                date:dateTime.date,
+                time:dateTime.time
+            });
+        }
+    });
+
+    /* Order Notifications */
+    orders.forEach((order,index)=>{
+
+        const orderId = order.id || ("ORD" + (1001 + index));
+
+        const customer = order.customerName ||
+            order.customer ||
+            order.name ||
+            "Customer";
+
+        const newOrderId = "order-" + orderId;
+        const newOrderDateTime = getNotificationDateTime(newOrderId);
+
+        notifications.push({
+            id:newOrderId,
+            type:"order",
+            icon:"🛒",
+            color:"green",
+            title:"New Order Received",
+            message:"Order #" + orderId +
+                " has been placed by " + customer + ".",
+            date:order.date || newOrderDateTime.date,
+            time:newOrderDateTime.time
+        });
+
+        const status = String(order.status || "").toLowerCase();
+
+        const statusDetails = {
+            shipped:{
+                icon:"🚚",
+                color:"blue",
+                title:"Order Shipped",
+                message:"Order #" + orderId +
+                    " has been shipped successfully.",
+                type:"order"
+            },
+            delivered:{
+                icon:"✅",
+                color:"green",
+                title:"Order Delivered",
+                message:"Order #" + orderId +
+                    " has been delivered successfully.",
+                type:"order"
+            },
+            processing:{
+                icon:"⏳",
+                color:"orange",
+                title:"Order Processing",
+                message:"Order #" + orderId +
+                    " is currently being processed.",
+                type:"order"
+            },
+            cancelled:{
+                icon:"❌",
+                color:"red",
+                title:"Order Cancelled",
+                message:"Order #" + orderId +
+                    " has been cancelled.",
+                type:"alert"
+            }
+        };
+
+        if(statusDetails[status]){
+
+            const details = statusDetails[status];
+            const id = status + "-" + orderId;
+            const dateTime = getNotificationDateTime(id);
+
+            notifications.push({
+                id:id,
+                type:details.type,
+                icon:details.icon,
+                color:details.color,
+                title:details.title,
+                message:details.message,
+                date:order.date || dateTime.date,
+                time:dateTime.time
+            });
+        }
+    });
+
+    /* Customer Notifications */
+    customers.forEach((customer,index)=>{
+
+        const id = "customer-" + (customer.id || index);
+        const dateTime = getNotificationDateTime(id);
+
+        notifications.push({
+            id:id,
+            type:"customer",
+            icon:"👤",
+            color:"purple",
+            title:"Customer Added",
+            message:(customer.name || "A customer") +
+                " is registered as a new customer.",
+            date:dateTime.date,
+            time:dateTime.time
+        });
+    });
+
+    return notifications;
+}
+
+/* Open Popup */
+function openNotificationPopup(notification){
+
+    document.getElementById("modalIcon").textContent =
+        notification.icon;
+
+    document.getElementById("modalIcon").className =
+        "modal-icon " + notification.color;
+
+    document.getElementById("modalTitle").textContent =
+        notification.title;
+
+    document.getElementById("modalMessage").textContent =
+        notification.message;
+
+    document.getElementById("modalDate").textContent =
+        notification.date;
+
+    document.getElementById("modalTime").textContent =
+        notification.time;
+
+    document.getElementById("notificationModal").style.display =
+        "flex";
+}
+
+/* Close Popup */
+function closeNotificationPopup(){
+    document.getElementById("notificationModal").style.display =
+        "none";
+}
+
+document.getElementById("closeModal").addEventListener(
+    "click",
+    closeNotificationPopup
+);
+
+/* Close Popup on Outside Click */
+document.getElementById("notificationModal").addEventListener(
+    "click",
+    function(event){
+        if(event.target === this){
+            closeNotificationPopup();
+        }
+    }
+);
+
+/* Display Notifications */
+function displayNotifications(){
+
+    const notifications = createNotifications();
+    const readIds = getReadNotifications();
+
+    const list = document.getElementById("notificationList");
+
+    list.innerHTML = "";
+
+    if(notifications.length === 0){
+
+        list.innerHTML = `
+            <div class="no-result">
+                🔔 No notifications available.
+            </div>
+        `;
+
+        updateCards([],[]);
+        return;
+    }
+
+    notifications.forEach(notification=>{
+
+        const isRead = readIds.includes(notification.id);
+
+        const item = document.createElement("div");
+
+        item.className = "notification" + (isRead ? "" : " unread");
+
+        item.dataset.search = (
+            notification.title + " " + notification.message
+        ).toLowerCase();
+
+        const icon = document.createElement("div");
+        icon.className = "icon " + notification.color;
+        icon.textContent = notification.icon;
+
+        const content = document.createElement("div");
+        content.className = "notification-content";
+
+        const title = document.createElement("h3");
+        title.textContent = notification.title;
+
+        const message = document.createElement("p");
+        message.textContent = notification.message;
+
+        content.appendChild(title);
+        content.appendChild(message);
+
+        const time = document.createElement("div");
+        time.className = "time";
+        time.textContent = notification.date;
+
+        item.appendChild(icon);
+        item.appendChild(content);
+        item.appendChild(time);
+
+        /* Click = Mark as Read + Open Popup */
+        item.addEventListener("click",function(){
+
+            const currentReadIds = getReadNotifications();
+
+            if(!currentReadIds.includes(notification.id)){
+                currentReadIds.push(notification.id);
+                saveReadNotifications(currentReadIds);
+                item.classList.remove("unread");
+            }
+
+            updateCards(notifications,currentReadIds);
+            openNotificationPopup(notification);
+        });
+
+        list.appendChild(item);
+    });
+
+    updateCards(notifications,readIds);
+}
+
+/* Update Summary Cards */
+function updateCards(notifications,readIds){
+
+    const total = notifications.length;
+
+    const unread = notifications.filter(notification=>
+        !readIds.includes(notification.id)
+    ).length;
+
+    const alerts = notifications.filter(notification=>
+        notification.type === "alert"
+    ).length;
+
+    document.getElementById("totalNotifications").textContent = total;
+    document.getElementById("unreadNotifications").textContent = unread;
+    document.getElementById("alertNotifications").textContent = alerts;
+}
+
+/* Mark All as Read */
+document.getElementById("markAllRead").addEventListener(
+    "click",
+    function(){
+
+        const notifications = createNotifications();
+
+        const ids = notifications.map(notification=>
+            notification.id
+        );
+
+        saveReadNotifications(ids);
+        displayNotifications();
+    }
+);
+
+/* Search Notifications */
+document.getElementById("notificationSearch").addEventListener(
+    "input",
+    function(){
+
+        const searchText = this.value.toLowerCase().trim();
+
+        const items = document.querySelectorAll(".notification");
+
+        items.forEach(item=>{
+
+            const text = item.dataset.search || "";
+
+            item.style.display =
+                searchText === "" || text.includes(searchText)
+                    ? "flex"
+                    : "none";
+        });
+    }
+);
+
+/* Sync Theme and Notifications Across Tabs */
+window.addEventListener("storage",function(event){
+
+    if(event.key === appearanceKey){
+        applyTheme(localStorage.getItem(appearanceKey) || "light");
+    }
+
+    if(
+        event.key === "stockhubProducts" ||
+        event.key === "stockhubOrders" ||
+        event.key === "stockhubCustomers" ||
+        event.key === readStorageKey ||
+        event.key === null
+    ){
+        displayNotifications();
+    }
+});
+
+/* Initial Load */
+displayNotifications();
+
+</script>
+
+</body>
+</html>
+```

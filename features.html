@@ -1,0 +1,178 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockHub - Explore Features</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:#171323;color:white;font-family:Arial,sans-serif;display:flex;flex-direction:column}
+header{padding:20px 7%;display:flex;align-items:center;gap:12px}
+.brand-icon{width:42px;height:42px;background:#302447;border:1px solid #51436e;border-radius:12px;display:grid;place-items:center;font-size:24px}
+.brand-name{font-size:25px;font-weight:bold}
+.slider{width:100%;max-width:680px;margin:auto;padding:15px 24px 30px;text-align:center}
+.slide{display:none}
+.slide.active{display:block;animation:fade .4s ease}
+.art{width:100%;max-width:440px;height:270px;margin:0 auto 28px;background:linear-gradient(145deg,#302447,#211b30);border:1px solid #49375f;border-radius:25px;display:grid;place-items:center;overflow:hidden}
+.art svg{width:90%;height:90%;max-height:250px}
+h1{font-size:29px;margin-bottom:13px}
+h1 span{color:#a78bfa}
+.description{color:#bcb2cc;font-size:15px;line-height:1.8;max-width:480px;margin:auto;min-height:55px}
+.controls{margin-top:28px;display:flex;justify-content:space-between;align-items:center}
+button{cursor:pointer;font-size:14px}
+.skip{border:0;background:transparent;color:#bcb2cc;padding:12px}
+.next{border:0;background:#7c3aed;color:white;padding:13px 25px;border-radius:9px;font-weight:bold}
+.next:hover{background:#6d28d9}
+.dots{display:flex;justify-content:center;gap:9px;margin-top:26px}
+.dot{height:8px;width:8px;background:#51465f;border-radius:10px;transition:.3s}
+.dot.active{width:24px;background:#a78bfa}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:500px){.art{height:225px}h1{font-size:25px}.slider{padding-left:18px;padding-right:18px}}
+</style>
+</head>
+
+<body>
+<header>
+    <div class="brand-icon">📦</div>
+    <div class="brand-name">StockHub</div>
+</header>
+
+<main class="slider">
+
+    <!-- SLIDE 1: WAREHOUSE -->
+    <section class="slide active">
+        <div class="art">
+            <svg viewBox="0 0 400 250" role="img" aria-label="Warehouse illustration">
+                <path d="M65 105 L200 35 L335 105 V215 H65Z" fill="#493366" stroke="#a78bfa" stroke-width="3"/>
+                <path d="M45 108 L200 25 L355 108" fill="none" stroke="#c4b5fd" stroke-width="7" stroke-linejoin="round"/>
+                <rect x="95" y="125" width="75" height="90" rx="4" fill="#7c3aed"/>
+                <rect x="185" y="125" width="75" height="90" rx="4" fill="#a78bfa"/>
+                <rect x="105" y="137" width="55" height="10" fill="#ddd6fe"/>
+                <rect x="195" y="137" width="55" height="10" fill="#ede9fe"/>
+                <path d="M132 150 V195 M222 150 V195" stroke="#493366" stroke-width="3"/>
+                <circle cx="310" cy="55" r="22" fill="#302447" stroke="#a78bfa" stroke-width="2"/>
+                <path d="M300 55 L308 63 L322 46" fill="none" stroke="#ddd6fe" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <h1>Welcome to <span>StockHub</span></h1>
+        <p class="description">Your smart warehouse management companion. Manage warehouse activities easily in one place.</p>
+    </section>
+
+    <!-- SLIDE 2: INVENTORY -->
+    <section class="slide">
+        <div class="art">
+            <svg viewBox="0 0 400 250" role="img" aria-label="Inventory management illustration">
+                <rect x="65" y="35" width="270" height="180" rx="12" fill="#302447" stroke="#a78bfa" stroke-width="3"/>
+                <path d="M65 85 H335 M65 145 H335" stroke="#71559a" stroke-width="3"/>
+                <rect x="85" y="48" width="48" height="30" rx="4" fill="#7c3aed"/>
+                <rect x="145" y="48" width="48" height="30" rx="4" fill="#a78bfa"/>
+                <rect x="205" y="48" width="48" height="30" rx="4" fill="#7c3aed"/>
+                <rect x="265" y="48" width="48" height="30" rx="4" fill="#a78bfa"/>
+                <rect x="90" y="97" width="65" height="40" rx="5" fill="#7c3aed"/>
+                <rect x="170" y="97" width="65" height="40" rx="5" fill="#a78bfa"/>
+                <rect x="250" y="97" width="65" height="40" rx="5" fill="#7c3aed"/>
+                <rect x="90" y="158" width="65" height="42" rx="5" fill="#a78bfa"/>
+                <rect x="170" y="158" width="65" height="42" rx="5" fill="#7c3aed"/>
+                <rect x="250" y="158" width="65" height="42" rx="5" fill="#a78bfa"/>
+                <path d="M108 110 H137 M188 110 H217 M268 110 H297" stroke="#ede9fe" stroke-width="3"/>
+            </svg>
+        </div>
+        <h1>Smart <span>Inventory</span></h1>
+        <p class="description">Monitor products, manage stock quantities and identify low-stock items easily.</p>
+    </section>
+
+    <!-- SLIDE 3: ORDERS -->
+    <section class="slide">
+        <div class="art">
+            <svg viewBox="0 0 400 250" role="img" aria-label="Orders and delivery illustration">
+                <rect x="40" y="75" width="185" height="105" rx="10" fill="#493366" stroke="#a78bfa" stroke-width="3"/>
+                <path d="M40 110 H225 M132 75 V180" stroke="#a78bfa" stroke-width="3"/>
+                <path d="M225 115 H280 L325 155 V180 H225Z" fill="#7c3aed" stroke="#c4b5fd" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M280 115 V155 H325" fill="none" stroke="#c4b5fd" stroke-width="3"/>
+                <circle cx="95" cy="190" r="19" fill="#211b30" stroke="#c4b5fd" stroke-width="5"/>
+                <circle cx="276" cy="190" r="19" fill="#211b30" stroke="#c4b5fd" stroke-width="5"/>
+                <path d="M65 93 L105 93 M155 93 L195 93" stroke="#ddd6fe" stroke-width="4"/>
+                <path d="M145 48 L163 66 L198 31" fill="none" stroke="#c4b5fd" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h1>Orders & <span>Suppliers</span></h1>
+        <p class="description">Track customer orders, organize supplier details and manage deliveries efficiently.</p>
+    </section>
+
+    <!-- SLIDE 4: ANALYTICS -->
+    <section class="slide">
+        <div class="art">
+            <svg viewBox="0 0 400 250" role="img" aria-label="Reports and analytics illustration">
+                <rect x="55" y="30" width="290" height="190" rx="14" fill="#302447" stroke="#a78bfa" stroke-width="3"/>
+                <path d="M85 180 H315 M85 145 H315 M85 110 H315" stroke="#493366" stroke-width="2"/>
+                <rect x="95" y="125" width="35" height="55" rx="4" fill="#7c3aed"/>
+                <rect x="150" y="95" width="35" height="85" rx="4" fill="#a78bfa"/>
+                <rect x="205" y="65" width="35" height="115" rx="4" fill="#7c3aed"/>
+                <rect x="260" y="85" width="35" height="95" rx="4" fill="#c4b5fd"/>
+                <path d="M95 85 L155 65 L215 77 L290 48" fill="none" stroke="#ede9fe" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="95" cy="85" r="5" fill="#ede9fe"/>
+                <circle cx="155" cy="65" r="5" fill="#ede9fe"/>
+                <circle cx="215" cy="77" r="5" fill="#ede9fe"/>
+                <circle cx="290" cy="48" r="5" fill="#ede9fe"/>
+            </svg>
+        </div>
+        <h1>Reports in <span>One Place</span></h1>
+        <p class="description">Explore reports, customer records, notifications and useful warehouse tools.</p>
+    </section>
+
+    <div class="controls">
+        <button class="skip" id="skipBtn" onclick="goToLogin()">Skip</button>
+        <button class="next" id="nextBtn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <div class="dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
+
+</main>
+
+<script>
+let currentSlide = 0;
+
+const slides = document.querySelectorAll(".slide");
+const dots = document.querySelectorAll(".dot");
+const nextBtn = document.getElementById("nextBtn");
+const skipBtn = document.getElementById("skipBtn");
+
+function showSlide(index) {
+    slides.forEach(slide => slide.classList.remove("active"));
+    dots.forEach(dot => dot.classList.remove("active"));
+
+    slides[index].classList.add("active");
+    dots[index].classList.add("active");
+
+    if (index === slides.length - 1) {
+        nextBtn.textContent = "Get Started →";
+        skipBtn.style.visibility = "hidden";
+    } else {
+        nextBtn.textContent = "Next →";
+        skipBtn.style.visibility = "visible";
+    }
+}
+
+function nextSlide() {
+    if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        showSlide(currentSlide);
+    } else {
+        goToLogin();
+    }
+}
+
+function goToLogin() {
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
